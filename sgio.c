@@ -98,10 +98,10 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
     size_t total = 0;
 
     for (int i = 0; i < iovcnt; i++) {
-        total += iov.iov_len;
+        total += iov->iov_len;
     }
 
-    hdr.interface_is = 'S';
+    hdr.interface_id = 'S';
     hdr.dxfer_direction = dir;
     hdr.cmd_len = sizeof(cdb);
     hdr.mx_sb_len = sizeof(sense);
