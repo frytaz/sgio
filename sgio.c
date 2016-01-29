@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <scsi/sg.h>
 
 typedef struct {
     int fd;
@@ -27,8 +28,8 @@ typedef struct {
 #define SGIO_ACTIVE (1ULL << 63)
 
 typedef enum {
-    SGIO_READ = 0,
-    SGIO_WRITE = 1,
+    SGIO_READ = SG_DXFER_FROM_DEV,
+    SGIO_WRITE = SG_DXFER_TO_DEV,
 } sgio_rdwr_t;
 
 static sgiom_t sgiom[1];
@@ -89,8 +90,28 @@ sgio_capable(const char *path)
 }
 
 static ssize_t
-sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t write, const struct iovec *iov, int iovcnt)
+sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
 {
+    sg_io_hdr_t hdr;
+    uint8_t cdb[16];
+    uint8_t sense[128];
+    size_t total = 0;
+
+    for (int i = 0; i < iovcnt; i++) {
+        total += iov.iov_len;
+    }
+
+    hdr.interface_is = 'S';
+    hdr.dxfer_direction = dir;
+    hdr.cmd_len = sizeof(cdb);
+    hdr.mx_sb_len = sizeof(sense);
+    hdr.iovec_count = iovcnt;
+    hdr.dxfer_len = total;
+    hdr.dxferp = iov;
+    hdr.cmdp = cdb;
+    hdr.sbp = sense;
+    hdr.flags = SG_FLAG_DIRECT_IO;
+
     return -1;
 }
 
