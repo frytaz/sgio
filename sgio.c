@@ -37,6 +37,12 @@ rem_sgio(int fd)
 static sgio_magic_t *
 lookup_sgio(int fd)
 {
+    for (int i = 0; i < sizeof(_sgiom) / sizeof(sgio_magic_t); i++) {
+        if (fd == _sgiom[i].fd) {
+            return &_sgiom[i];
+        }
+    }
+
     return NULL;
 }
 
