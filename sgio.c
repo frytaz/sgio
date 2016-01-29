@@ -137,7 +137,7 @@ read(int fd, void *buf, size_t count)
     if (sgio == NULL) {
         return read_(fd, buf, count);
     } else {
-        struct iovec iov = {
+        const struct iovec iov = {
             .iov_base = buf,
             .iov_len = count
         };
@@ -177,7 +177,16 @@ write(int fd, const void *buf, size_t count)
 
     WRAPSYSCALL(write_, "write");
 
-    return -1;
+    sgiom_t *sgio = lookup_sgio(fd);
+    if (sgio == NULL) {
+        return write_(fd, buf, count);
+    } else {
+        const struct iovec iov = {
+            .iov_base = buf,
+            .iov_len = count
+        };
+        return sgio_rdwr(sgio, SGIO_WRITE, &iov, 1);
+    }
 }
 
 ssize_t
