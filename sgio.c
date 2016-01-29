@@ -133,6 +133,17 @@ read(int fd, void *buf, size_t count)
 
     WRAPSYSCALL(read_, "read");
 
+    sgiom_t *sgio = lookup_sgio(fd);
+    if (sgio == NULL) {
+        return read_(fd, buf, count);
+    } else {
+        struct iovec iov = {
+            .iov_base = buf,
+            .iov_len = count
+        };
+        return sgio_rdwr(sgio, SGIO_READ, &iov, 1);
+    }
+
     return -1;
 }
 
