@@ -129,7 +129,7 @@ pread(int fd, void *buf, size_t count, off_t offset)
 ssize_t
 read(int fd, void *buf, size_t count)
 {
-    static int (*read_)(int, void  *, size_t, off_t) = NULL;
+    static int (*read_)(int, void  *, size_t) = NULL;
 
     WRAPSYSCALL(read_, "read");
 
@@ -164,7 +164,7 @@ pwrite(int fd, const void *buf, size_t count, off_t offset)
 ssize_t
 write(int fd, const void *buf, size_t count)
 {
-    static int (*write_)(int, const void  *, size_t, off_t) = NULL;
+    static int (*write_)(int, const void  *, size_t) = NULL;
 
     WRAPSYSCALL(write_, "write");
 
