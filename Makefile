@@ -6,11 +6,15 @@ OBJS = $(SRCS:.c=.o)
 TARGET = sgio.so
 
 CFLAGS = -fPIC
+CFLAGS += -Wall
+CFLAGS += -std=c99
+
 LDLIBS = -ldl
 
 $(TARGET): $(OBJS)
 	$(CC) -shared $< -o $@ $(LDLIBS)
-	#$(CC) -shared $(OBJS) -o $(TARGET) $(LDLIBS)
+
+all: $(TARGET)
 
 clean:
 	$(RM) $(TARGET) $(OBJS)
