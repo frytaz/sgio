@@ -74,7 +74,7 @@ open(const char *path, int flags, ...)
         va_end(ap);
         fd = open_(path, flags, mode);
     } else {
-        int fd = open_(path, flags);
+        fd = open_(path, flags);
     }
 
     if (sgio_capable(path)) {
