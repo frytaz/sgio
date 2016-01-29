@@ -63,7 +63,7 @@ sgio_capable(const char *path)
     return false;
 }
 
-static int
+static ssize_t
 sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t write, const struct iovec *iov, int iovcnt)
 {
     return -1;
