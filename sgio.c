@@ -11,6 +11,7 @@
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
 
