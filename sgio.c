@@ -123,7 +123,7 @@ pread(int fd, void *buf, size_t count, off_t offset)
 
     WRAPSYSCALL(pread_, "pread");
 
-    return -1;
+    return pread_(fd, buf, count, offset);
 }
 
 ssize_t
@@ -167,7 +167,7 @@ pwrite(int fd, const void *buf, size_t count, off_t offset)
 
     WRAPSYSCALL(pwrite_, "pwrite");
 
-    return -1;
+    return pwrite_(fd, buf, count, offset);
 }
 
 ssize_t
