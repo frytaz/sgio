@@ -143,7 +143,12 @@ readv(int fd, const struct iovec *iov, int iovcnt)
 
     WRAPSYSCALL(readv_, "readv");
 
-    return -1;
+    sgiom_t *sgio = lookup_sgio(fd);
+    if (sgio == NULL) {
+        return readv_(fd, iov, iovcnt);
+    } else {
+        return sgio_rdwr(sgio, SGIO_READ, iov, iovcnt);
+    }
 }
 
 ssize_t
