@@ -63,8 +63,18 @@ open(const char *path, int flags, ...)
 
     WRAPSYSCALL(open_, "open");
 
-    /* XXX Add ... handler for O_CREAT */
-    int fd = open_(path, flags);
+    va_list ap;
+    mode_t mode;
+    int fd;
+
+    if (flags & O_CREAT) {
+        va_start(ap, flags);
+        mode = va_arg(ap, mode_t);
+        va_end(ap);
+        fd = open_(path, flags, mode);
+    } else {
+        int fd = open_(path, flags);
+    }
 
     if (sgio_capable(path)) {
         add_sgio(fd);
