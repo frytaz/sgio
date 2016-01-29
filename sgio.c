@@ -17,11 +17,21 @@
 #include <unistd.h>
 
 typedef struct {
-    uint64_t flags;
     int fd;
-} sgio_magic_t;
+    uint64_t flags;
+    size_t blocksize;
+    size_t nblocks;
+    off_t offset;
+} sgiom_t;
 
-static sgio_magic_t _sgiom[1];
+#define SGIO_ACTIVE (1 << 63)
+
+typedef enum {
+    SGIO_READ = 0,
+    SGIO_WRITE = 1,
+} sgio_rdwr_t;
+
+static sgiom_t sgiom[1];
 
 static int
 add_sgio(int fd)
@@ -35,12 +45,12 @@ rem_sgio(int fd)
     return -1;
 }
 
-static sgio_magic_t *
+static sgiom_t *
 lookup_sgio(int fd)
 {
-    for (int i = 0; i < sizeof(_sgiom) / sizeof(sgio_magic_t); i++) {
-        if (fd == _sgiom[i].fd) {
-            return &_sgiom[i];
+    for (int i = 0; i < sizeof(sgiom) / sizeof(sgiom_t); i++) {
+        if (fd == sgiom[i].fd) {
+            return &sgiom[i];
         }
     }
 
@@ -51,6 +61,12 @@ static bool
 sgio_capable(const char *path)
 {
     return false;
+}
+
+static int
+sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t write, const struct iovec *iov, int iovcnt)
+{
+    return -1;
 }
 
 #define WRAPSYSCALL(ptr, name) \
@@ -157,5 +173,10 @@ writev(int fd, const struct iovec *iov, int iovcnt)
 
     WRAPSYSCALL(writev_, "writev");
 
-    return -1;
+    sgiom_t *sgio = lookup_sgio(fd);
+    if (sgio == NULL) {
+        return writev_(fd, iov, iovcnt);
+    } else {
+        return sgio_rdwr(sgio, SGIO_WRITE, iov, iovcnt);
+    }
 }
