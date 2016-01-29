@@ -24,7 +24,7 @@ typedef struct {
     off_t offset;
 } sgiom_t;
 
-#define SGIO_ACTIVE (1 << 63)
+#define SGIO_ACTIVE (1ULL << 63)
 
 typedef enum {
     SGIO_READ = 0,
