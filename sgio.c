@@ -75,7 +75,6 @@ rem_sgio(int fd)
 
     sgio->flags &= ~SGIO_ACTIVE;
     sgio->fd = -1;
-    // FIXME
     sgio->blocksize = 0;
     sgio->nblocks = 0;
     sgio->offset = 0;
