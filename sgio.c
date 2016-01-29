@@ -119,7 +119,7 @@ close(int fd)
 ssize_t
 pread(int fd, void *buf, size_t count, off_t offset)
 {
-    static int (*pread_)(int, void  *, size_t, off_t) = NULL;
+    static ssize_t (*pread_)(int, void  *, size_t, off_t) = NULL;
 
     WRAPSYSCALL(pread_, "pread");
 
@@ -129,7 +129,7 @@ pread(int fd, void *buf, size_t count, off_t offset)
 ssize_t
 read(int fd, void *buf, size_t count)
 {
-    static int (*read_)(int, void  *, size_t) = NULL;
+    static ssize_t (*read_)(int, void  *, size_t) = NULL;
 
     WRAPSYSCALL(read_, "read");
 
@@ -148,7 +148,7 @@ read(int fd, void *buf, size_t count)
 ssize_t
 readv(int fd, const struct iovec *iov, int iovcnt)
 {
-    static int (*readv_)(int, const struct iovec *, int) = NULL;
+    static ssize_t (*readv_)(int, const struct iovec *, int) = NULL;
 
     WRAPSYSCALL(readv_, "readv");
 
@@ -163,7 +163,7 @@ readv(int fd, const struct iovec *iov, int iovcnt)
 ssize_t
 pwrite(int fd, const void *buf, size_t count, off_t offset)
 {
-    static int (*pwrite_)(int, const void  *, size_t, off_t) = NULL;
+    static ssize_t (*pwrite_)(int, const void  *, size_t, off_t) = NULL;
 
     WRAPSYSCALL(pwrite_, "pwrite");
 
@@ -173,7 +173,7 @@ pwrite(int fd, const void *buf, size_t count, off_t offset)
 ssize_t
 write(int fd, const void *buf, size_t count)
 {
-    static int (*write_)(int, const void  *, size_t) = NULL;
+    static ssize_t (*write_)(int, const void  *, size_t) = NULL;
 
     WRAPSYSCALL(write_, "write");
 
@@ -183,7 +183,7 @@ write(int fd, const void *buf, size_t count)
 ssize_t
 writev(int fd, const struct iovec *iov, int iovcnt)
 {
-    static int (*writev_)(int, const struct iovec *, int) = NULL;
+    static ssize_t (*writev_)(int, const struct iovec *, int) = NULL;
 
     WRAPSYSCALL(writev_, "writev");
 
