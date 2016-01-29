@@ -117,7 +117,7 @@ close(int fd)
 }
 
 ssize_t
-pread(int fd, void *buf, size_t nbyte, off_t offset)
+pread(int fd, void *buf, size_t count, off_t offset)
 {
     static int (*pread_)(int, void  *, size_t, off_t) = NULL;
 
@@ -127,7 +127,7 @@ pread(int fd, void *buf, size_t nbyte, off_t offset)
 }
 
 ssize_t
-read(int fd, void *buf, size_t nbyte)
+read(int fd, void *buf, size_t count)
 {
     static int (*read_)(int, void  *, size_t, off_t) = NULL;
 
@@ -152,7 +152,7 @@ readv(int fd, const struct iovec *iov, int iovcnt)
 }
 
 ssize_t
-pwrite(int fd, const void *buf, size_t nbyte, off_t offset)
+pwrite(int fd, const void *buf, size_t count, off_t offset)
 {
     static int (*pwrite_)(int, const void  *, size_t, off_t) = NULL;
 
@@ -162,7 +162,7 @@ pwrite(int fd, const void *buf, size_t nbyte, off_t offset)
 }
 
 ssize_t
-write(int fd, const void *buf, size_t nbyte)
+write(int fd, const void *buf, size_t count)
 {
     static int (*write_)(int, const void  *, size_t, off_t) = NULL;
 
