@@ -80,35 +80,59 @@ close(int fd)
 ssize_t
 pread(int fd, void *buf, size_t nbyte, off_t offset)
 {
+    static int (*pread_)(int, void  *, size_t, off_t) = NULL;
+
+    WRAPSYSCALL(pread_, "pread");
+
     return -1;
 }
 
 ssize_t
 read(int fd, void *buf, size_t nbyte)
 {
+    static int (*read_)(int, void  *, size_t, off_t) = NULL;
+
+    WRAPSYSCALL(read_, "read");
+
     return -1;
 }
 
 ssize_t
 readv(int fd, const struct iovec *iov, int iovcnt)
 {
+    static int (*readv_)(int, const struct iovec *, int) = NULL;
+
+    WRAPSYSCALL(readv_, "readv");
+
     return -1;
 }
 
 ssize_t
 pwrite(int fd, const void *buf, size_t nbyte, off_t offset)
 {
+    static int (*pwrite_)(int, const void  *, size_t, off_t) = NULL;
+
+    WRAPSYSCALL(pwrite_, "pwrite");
+
     return -1;
 }
 
 ssize_t
 write(int fd, const void *buf, size_t nbyte)
 {
+    static int (*write_)(int, const void  *, size_t, off_t) = NULL;
+
+    WRAPSYSCALL(write_, "write");
+
     return -1;
 }
 
 ssize_t
 writev(int fd, const struct iovec *iov, int iovcnt)
 {
+    static int (*writev_)(int, const struct iovec *, int) = NULL;
+
+    WRAPSYSCALL(writev_, "writev");
+
     return -1;
 }
