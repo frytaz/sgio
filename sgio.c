@@ -33,18 +33,6 @@ typedef enum {
 
 static sgiom_t sgiom[1];
 
-static int
-add_sgio(int fd)
-{
-    return -1;
-}
-
-static int
-rem_sgio(int fd)
-{
-    return -1;
-}
-
 static sgiom_t *
 lookup_sgio(int fd)
 {
@@ -55,6 +43,44 @@ lookup_sgio(int fd)
     }
 
     return NULL;
+}
+
+static int
+add_sgio(int fd)
+{
+    sgiom_t *sgio = sgiom;
+
+    if (sgio->flags & SGIO_ACTIVE) {
+        return -1;
+    }
+
+    sgio->flags |= SGIO_ACTIVE;
+    sgio->fd = fd;
+    // FIXME
+    sgio->blocksize = 512;
+    sgio->nblocks = 1 << 31;
+    sgio->offset = 0;
+
+    return 0;
+}
+
+static int
+rem_sgio(int fd)
+{
+    sgiom_t *sgio = lookup_sgio(fd);
+
+    if (sgio == NULL) {
+        return -1;
+    }
+
+    sgio->flags &= ~SGIO_ACTIVE;
+    sgio->fd = -1;
+    // FIXME
+    sgio->blocksize = 0;
+    sgio->nblocks = 0;
+    sgio->offset = 0;
+
+    return 0;
 }
 
 static bool
