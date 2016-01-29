@@ -143,8 +143,6 @@ read(int fd, void *buf, size_t count)
         };
         return sgio_rdwr(sgio, SGIO_READ, &iov, 1);
     }
-
-    return -1;
 }
 
 ssize_t
