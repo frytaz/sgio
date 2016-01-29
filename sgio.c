@@ -80,7 +80,13 @@ close(int fd)
 
     WRAPSYSCALL(close_, "close");
 
-    return -1;
+    int rc = close_(fd);
+
+    if (lookup_sgio(fd) != NULL) {
+        rem_sgio(fd);
+    }
+
+    return rc;
 }
 
 ssize_t
