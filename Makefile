@@ -8,6 +8,7 @@ TARGET = sgio.so
 CFLAGS = -fPIC
 CFLAGS += -Wall
 CFLAGS += -std=c99
+#CFLAGS += -m64
 
 LDLIBS = -ldl
 
