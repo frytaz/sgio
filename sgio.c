@@ -87,6 +87,8 @@ add_sgio(int fd)
         return -1;
     }
 
+    SGDBG(LOG_DEBUG, "Adding SGIO for fd=%d", fd);
+
     sgio->flags |= SGIO_ACTIVE;
     sgio->fd = fd;
     // FIXME
@@ -246,7 +248,7 @@ read(int fd, void *buf, size_t count)
             .iov_base = buf,
             .iov_len = count
         };
-        SGDBG(LOG_DEBUG, "Replacing read() with ioctl(SG_IO)");
+        SGDBG(LOG_DEBUG, "Replacing read(%d) with ioctl(%d, SG_IO)", fd, fd);
         return sgio_rdwr(sgio, SGIO_READ, &iov, 1);
     }
 }
