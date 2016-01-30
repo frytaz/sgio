@@ -53,8 +53,11 @@ sgdbg(int lvl, const char *file, const int line, const char *fmt, ...)
 #endif
 
     va_start(ap, fmt);
-    vsnprintf(buf, BUFLEN, fmt, ap);
+    //vsnprintf(buf, BUFLEN, fmt, ap);
+    vfprintf(stderr, fmt, ap);
     va_end(ap);
+
+    return;
 
     syslog(LOG_LOCAL0 | lvl, "%s:%d\t%s", file, line, buf);
 }
