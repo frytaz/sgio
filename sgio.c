@@ -132,13 +132,14 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
     uint8_t cdb[16] = { 0 };
     uint8_t sense[128] = { 0 };
     size_t total = 0;
+    const char *cmd = (dir == SGIO_READ) ? "READ(16)" : "WRITE(16)";
 
     for (int i = 0; i < iovcnt; i++) {
         total += iov->iov_len;
     }
 
     SGDBG(LOG_DEBUG, "Running %s for %zd bytes from fd=%d",
-        (dir == SGIO_READ) ? "READ(16)" : "WRITE(16)", total, sgm->fd);
+        cmd, total, sgm->fd);
     assert(total % sgm->blocksize == 0);
 
     uint64_t lba = sgm->offset / sgm->blocksize;
@@ -175,7 +176,20 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
 
     SGDBG(LOG_DEBUG, "ioctl(SG_IO)=%d", rc);
 
-    return rc;
+    if (rc < 0) {
+        SGDBG(LOG_DEBUG, "ioctl(SG_IO) failed (%s)", strerror(errno));
+        return rc;
+    }
+
+    if (hdr.status != 0) {
+        SGDBG(LOG_DEBUG, "%s failed, SCSI STATUS 0x%hhx", cmd, hdr.status);
+        return -1;
+    }
+
+    int xferred = total - hdr.resid;
+    sgm.offset += xferred;
+
+    return xferred;
 }
 
 #define WRAPSYSCALL(ptr, name) \
