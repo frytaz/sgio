@@ -18,6 +18,7 @@
 #include <scsi/sg.h>
 
 #define DEFAULT_SCSI_TIMEOUT 10000  /* 10 sec */
+#define BUFLEN 128
 
 typedef struct {
     int fd;
@@ -35,6 +36,28 @@ typedef enum {
 } sgio_rdwr_t;
 
 static sgiom_t sgiom[1];
+
+static void
+sgdbg(int lvl, const char *file, const int line, const char *fmt, ...)
+{
+    char buf[BUFLEN];
+    va_list ap;
+
+#if defined(NDEBUG)
+    /* when in non-debug mode only emit messages up to LOG_INFO */
+    if (lvl > LOG_INFO) {
+        return;
+    }
+#endif
+
+    va_start(ap, fmt);
+    vsnprintf(buf, BUFLEN, fmt, ap);
+    va_end(ap);
+
+    syslog(LOG_LOCAL0 | lvl, "%s:%d\t%s", file, line, buf);
+}
+
+#define SGDBG(lvl, ...) sgdbg(lvl, __FILE__, __LINE__, __VA_ARGS__)
 
 static sgiom_t *
 lookup_sgio(int fd)
