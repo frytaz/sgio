@@ -83,7 +83,7 @@ add_sgio(int fd)
     sgiom_t *sgio = sgiom;
 
     if (sgio->flags & SGIO_ACTIVE) {
-        SGDBG("Another SGIO already active, skipping");
+        SGDBG(LOG_WARNING, "Another SGIO already active, skipping");
         return -1;
     }
 
