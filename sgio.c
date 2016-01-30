@@ -55,7 +55,7 @@ sgdbg(int lvl, const char *file, const int line, const char *fmt, ...)
 
     va_start(ap, fmt);
     //vsnprintf(buf, BUFLEN, fmt, ap);
-    vfprintf(stderr, fmt, ap);
+    vfprintf(stderr, fmt, ap); fprintf(stderr, "\n");
     va_end(ap);
 
     return;
@@ -83,6 +83,7 @@ add_sgio(int fd)
     sgiom_t *sgio = sgiom;
 
     if (sgio->flags & SGIO_ACTIVE) {
+        SGDBG("Another SGIO already active, skipping");
         return -1;
     }
 
