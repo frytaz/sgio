@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <scsi/sg.h>
 
+#define DEFAULT_SCSI_TIMEOUT 10000  /* 10 sec */
+
 typedef struct {
     int fd;
     uint64_t flags;
@@ -93,13 +95,33 @@ static ssize_t
 sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
 {
     sg_io_hdr_t hdr;
-    uint8_t cdb[16];
-    uint8_t sense[128];
+    uint8_t cdb[16] = { 0 };
+    uint8_t sense[128] = { 0 };
     size_t total = 0;
 
     for (int i = 0; i < iovcnt; i++) {
         total += iov->iov_len;
     }
+
+    assert(total % sgm->blocksize == 0);
+
+    uint64_t lba = sgm->offset / sgm->blocksize;
+    uint32_t xfer_length = total / sgm->blocksize;
+
+    // Build CDB
+    cdb[0] = (dir == SGIO_READ) ? 0x88 : 0x8a;
+    cdb[2] = (uint8_t)(lba >> 56 & 0xFF)
+    cdb[3] = (uint8_t)(lba >> 48 & 0xFF);
+    cdb[4] = (uint8_t)(lba >> 40 & 0xFF);
+    cdb[5] = (uint8_t)(lba >> 32 & 0xFF);
+    cdb[6] = (uint8_t)(lba >> 24 & 0xFF);
+    cdb[7] = (uint8_t)(lba >> 16 & 0xFF);
+    cdb[8] = (uint8_t)(lba >> 8 & 0xFF);
+    cdb[9] = (uint8_t)(lba & 0xFF);
+    cdb[10] = (uint8)(xfer_length >> 24 & 0xFF);
+    cdb[11] = (uint8)(xfer_length >> 16 & 0xFF);
+    cdb[12] = (uint8)(xfer_length >> 8 & 0xFF);
+    cdb[13] = (uint8)(xfer_length & 0xFF);
 
     hdr.interface_id = 'S';
     hdr.dxfer_direction = dir;
@@ -111,6 +133,7 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
     hdr.cmdp = cdb;
     hdr.sbp = sense;
     hdr.flags = SG_FLAG_DIRECT_IO;
+    hdr.timeout = DEFAULT_SCSI_TIMEOUT;
 
     return -1;
 }
