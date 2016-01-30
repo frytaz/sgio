@@ -41,7 +41,7 @@ typedef enum {
 static sgiom_t sgiom[1];
 
 static void
-sgdbg(int lvl, const char *file, const char *line, const char *fmt, ...)
+sgdbg(int lvl, const char *file, const int line, const char *fmt, ...)
 {
     char buf[BUFLEN];
     va_list ap;
@@ -60,7 +60,7 @@ sgdbg(int lvl, const char *file, const char *line, const char *fmt, ...)
 
     return;
 
-    syslog(LOG_LOCAL0 | lvl, "%s:%s\t%s", file, line, buf);
+    syslog(LOG_LOCAL0 | lvl, "%s:%d\t%s", file, line, buf);
 }
 
 #define SGDBG(lvl, ...) sgdbg(lvl, __FILE__, __LINE__, __VA_ARGS__)
