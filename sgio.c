@@ -116,7 +116,9 @@ rem_sgio(int fd)
 static bool
 sgio_capable(const char *path)
 {
-    return false;
+    const char *devsg = "/dev/sg";
+
+    return strncmp(path, devsg, strlen(devsg)) == 0;
 }
 
 static ssize_t
