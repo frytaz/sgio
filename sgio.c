@@ -110,7 +110,7 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
 
     // Build CDB
     cdb[0] = (dir == SGIO_READ) ? 0x88 : 0x8a;
-    cdb[2] = (uint8_t)(lba >> 56 & 0xFF)
+    cdb[2] = (uint8_t)(lba >> 56 & 0xFF);
     cdb[3] = (uint8_t)(lba >> 48 & 0xFF);
     cdb[4] = (uint8_t)(lba >> 40 & 0xFF);
     cdb[5] = (uint8_t)(lba >> 32 & 0xFF);
