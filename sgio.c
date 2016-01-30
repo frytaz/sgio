@@ -7,6 +7,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/ioctl.h>
 #include <sys/uio.h>
 #include <assert.h>
 #include <dlfcn.h>
