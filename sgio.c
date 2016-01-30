@@ -140,12 +140,14 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
         total += iov->iov_len;
     }
 
-    SGDBG(LOG_DEBUG, "Running %s for %zd bytes from fd=%d",
-        cmd, total, sgm->fd);
     assert(total % sgm->blocksize == 0);
 
     uint64_t lba = sgm->offset / sgm->blocksize;
     uint32_t xfer_length = total / sgm->blocksize;
+
+    SGDBG(LOG_DEBUG,
+        "Running %s for %zd bytes (%d blocks) from fd=%d at LBA %lld",
+        cmd, total, xfer_length, sgm->fd, lba);
 
     // Build CDB
     cdb[0] = (dir == SGIO_READ) ? 0x88 : 0x8a;
