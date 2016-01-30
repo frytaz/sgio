@@ -69,7 +69,7 @@ static sgiom_t *
 lookup_sgio(int fd)
 {
     for (int i = 0; i < sizeof(sgiom) / sizeof(sgiom_t); i++) {
-        if (fd == sgiom[i].fd) {
+        if ((fd == sgiom[i].fd) && (sgiom[i].flags & SGIO_ACTIVE)) {
             return &sgiom[i];
         }
     }
