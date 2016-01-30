@@ -188,7 +188,7 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
     }
 
     int xferred = total - hdr.resid;
-    sgm.offset += xferred;
+    sgm->offset += xferred;
 
     return xferred;
 }
