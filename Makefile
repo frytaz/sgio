@@ -9,6 +9,7 @@ CFLAGS = -fPIC
 CFLAGS += -Wall
 CFLAGS += -std=c99
 #CFLAGS += -m64
+CFLAGS += -DNDEBUG
 
 LDLIBS = -ldl
 

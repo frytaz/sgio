@@ -181,12 +181,12 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
     SGDBG(LOG_DEBUG, "ioctl(SG_IO)=%d", rc);
 
     if (rc < 0) {
-        SGDBG(LOG_DEBUG, "ioctl(SG_IO) failed (%s)", strerror(errno));
+        SGDBG(LOG_ERR, "ioctl(SG_IO) failed (%s)", strerror(errno));
         return rc;
     }
 
     if (hdr.status != 0) {
-        SGDBG(LOG_DEBUG, "%s failed, SCSI STATUS 0x%hhx", cmd, hdr.status);
+        SGDBG(LOG_ERR, "%s failed, SCSI STATUS 0x%hhx", cmd, hdr.status);
         return -1;
     }
 
