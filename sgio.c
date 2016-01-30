@@ -173,6 +173,8 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
 
     int rc = ioctl(sgm->fd, SG_IO, &hdr);
 
+    SGDBG(LOG_DEBUG, "ioctl(SG_IO)=%d", rc);
+
     return rc;
 }
 
