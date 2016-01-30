@@ -196,7 +196,9 @@ open(const char *path, int flags, ...)
         fd = open_(path, flags);
     }
 
+    SGDBG(LOG_DEBUG, "Checking %s", path);
     if (sgio_capable(path)) {
+        SGDBG(LOG_DEBUG, "Adding %s", path);
         add_sgio(fd);
     }
 
@@ -244,6 +246,7 @@ read(int fd, void *buf, size_t count)
             .iov_base = buf,
             .iov_len = count
         };
+        SGDBG(LOG_DEBUG, "Replacing read() with ioctl(SG_IO)");
         return sgio_rdwr(sgio, SGIO_READ, &iov, 1);
     }
 }
