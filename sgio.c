@@ -137,6 +137,8 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
         total += iov->iov_len;
     }
 
+    SGDBG(LOG_DEBUG, "Running %s for %zd bytes from fd=%d",
+        (dir == SGIO_READ) ? "READ(16)" : "WRITE(16)", total, sgm-fd);
     assert(total % sgm->blocksize == 0);
 
     uint64_t lba = sgm->offset / sgm->blocksize;
