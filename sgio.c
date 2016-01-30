@@ -167,7 +167,9 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
     hdr.flags = SG_FLAG_DIRECT_IO;
     hdr.timeout = DEFAULT_SCSI_TIMEOUT;
 
-    return -1;
+    int rc = ioctl(sgm->fd, SG_IO, &hdr);
+
+    return rc;
 }
 
 #define WRAPSYSCALL(ptr, name) \
