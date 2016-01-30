@@ -118,10 +118,10 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
     cdb[7] = (uint8_t)(lba >> 16 & 0xFF);
     cdb[8] = (uint8_t)(lba >> 8 & 0xFF);
     cdb[9] = (uint8_t)(lba & 0xFF);
-    cdb[10] = (uint8)(xfer_length >> 24 & 0xFF);
-    cdb[11] = (uint8)(xfer_length >> 16 & 0xFF);
-    cdb[12] = (uint8)(xfer_length >> 8 & 0xFF);
-    cdb[13] = (uint8)(xfer_length & 0xFF);
+    cdb[10] = (uint8_t)(xfer_length >> 24 & 0xFF);
+    cdb[11] = (uint8_t)(xfer_length >> 16 & 0xFF);
+    cdb[12] = (uint8_t)(xfer_length >> 8 & 0xFF);
+    cdb[13] = (uint8_t)(xfer_length & 0xFF);
 
     hdr.interface_id = 'S';
     hdr.dxfer_direction = dir;
