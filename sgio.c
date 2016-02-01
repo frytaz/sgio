@@ -477,3 +477,29 @@ writev(int fd, const struct iovec *iov, int iovcnt)
         return sgio_rdwr(sgio, SGIO_WRITE, iov, iovcnt);
     }
 }
+
+int
+fsync(int fd){
+    static int (*fsync_)(int) = NULL;
+
+    WRAPSYSCALL(fsync_, "fsync");
+
+    if (lookup_sgio(fd) == NULL) {
+        return fsync_(fd);
+    } else {
+        return 0;
+    }
+}
+
+int
+fdatasync(int fd) {
+    static int (*fdatasync_)(int) = NULL;
+
+    WRAPSYSCALL(fdatasync_, "fdatasync");
+
+    if (lookup_sgio(fd) == NULL) {
+        return fdatasync_(fd);
+    } else {
+        return 0;
+    }
+}
