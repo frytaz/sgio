@@ -243,6 +243,8 @@ rem_sgio(int fd)
         return -1;
     }
 
+    SGDBG(LOG_DEBUG, "Removing SGIO for fd=%d", fd);
+
     sgio->flags &= ~SGIO_ACTIVE;
     sgio->fd = -1;
     sgio->blocksize = 0;
