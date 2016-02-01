@@ -298,7 +298,7 @@ ioctl(int fd, unsigned long request, uintptr_t arg)
     sgiom_t *sgio = lookup_sgio(fd);
     if ((sgio != NULL) && (request == BLKGETSIZE64)) {
         uint64_t *size = (uint64_t*)arg;
-        size = sgio->blocksize;
+        *size = (uint64_t)sgio->blocksize;
         return 0;
     } else {
         return ioctl(fd, request, arg);
