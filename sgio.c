@@ -133,74 +133,6 @@ sgio_readcap(sgiom_t *sgm)
     return 0;
 }
 
-static sgiom_t *
-lookup_sgio(int fd)
-{
-    for (int i = 0; i < sizeof(sgiom) / sizeof(sgiom_t); i++) {
-        if ((fd == sgiom[i].fd) && (sgiom[i].flags & SGIO_ACTIVE)) {
-            return &sgiom[i];
-        }
-    }
-
-    return NULL;
-}
-
-static int
-add_sgio(int fd)
-{
-    sgiom_t *sgio = sgiom;
-
-    if (sgio->flags & SGIO_ACTIVE) {
-        SGDBG(LOG_WARNING, "Another SGIO already active, skipping");
-        return -1;
-    }
-
-    SGDBG(LOG_DEBUG, "Adding SGIO for fd=%d", fd);
-
-    sgio->flags |= SGIO_ACTIVE;
-    sgio->fd = fd;
-    sgio_readcap(sgio);
-    sgio->offset = 0;
-
-    return 0;
-}
-
-static int
-rem_sgio(int fd)
-{
-    sgiom_t *sgio = lookup_sgio(fd);
-
-    if (sgio == NULL) {
-        return -1;
-    }
-
-    sgio->flags &= ~SGIO_ACTIVE;
-    sgio->fd = -1;
-    sgio->blocksize = 0;
-    sgio->nblocks = 0;
-    sgio->offset = 0;
-
-    return 0;
-}
-
-static void
-update_sgio(int oldfd, int newfd) {
-    sgiom_t *sgio = lookup_sgio(oldfd);
-
-    if (sgio != NULL) {
-        SGDBG(LOG_DEBUG, "Replacing fd=%d with new fd=%d", oldfd, newfd);
-        sgio->fd = newfd;
-    }
-}
-
-static bool
-sgio_capable(const char *path)
-{
-    const char *devsg = "/dev/sg";
-
-    return strncmp(path, devsg, strlen(devsg)) == 0;
-}
-
 static ssize_t
 sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
 {
@@ -268,6 +200,74 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
     sgm->offset += xferred;
 
     return xferred;
+}
+
+static sgiom_t *
+lookup_sgio(int fd)
+{
+    for (int i = 0; i < sizeof(sgiom) / sizeof(sgiom_t); i++) {
+        if ((fd == sgiom[i].fd) && (sgiom[i].flags & SGIO_ACTIVE)) {
+            return &sgiom[i];
+        }
+    }
+
+    return NULL;
+}
+
+static int
+add_sgio(int fd)
+{
+    sgiom_t *sgio = sgiom;
+
+    if (sgio->flags & SGIO_ACTIVE) {
+        SGDBG(LOG_WARNING, "Another SGIO already active, skipping");
+        return -1;
+    }
+
+    SGDBG(LOG_DEBUG, "Adding SGIO for fd=%d", fd);
+
+    sgio->flags |= SGIO_ACTIVE;
+    sgio->fd = fd;
+    sgio_readcap(sgio);
+    sgio->offset = 0;
+
+    return 0;
+}
+
+static int
+rem_sgio(int fd)
+{
+    sgiom_t *sgio = lookup_sgio(fd);
+
+    if (sgio == NULL) {
+        return -1;
+    }
+
+    sgio->flags &= ~SGIO_ACTIVE;
+    sgio->fd = -1;
+    sgio->blocksize = 0;
+    sgio->nblocks = 0;
+    sgio->offset = 0;
+
+    return 0;
+}
+
+static void
+update_sgio(int oldfd, int newfd) {
+    sgiom_t *sgio = lookup_sgio(oldfd);
+
+    if (sgio != NULL) {
+        SGDBG(LOG_DEBUG, "Replacing fd=%d with new fd=%d", oldfd, newfd);
+        sgio->fd = newfd;
+    }
+}
+
+static bool
+sgio_capable(const char *path)
+{
+    const char *devsg = "/dev/sg";
+
+    return strncmp(path, devsg, strlen(devsg)) == 0;
 }
 
 #define WRAPSYSCALL(ptr, name) \
