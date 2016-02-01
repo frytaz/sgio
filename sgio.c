@@ -368,7 +368,7 @@ ioctl(int fd, unsigned long request, ...)
         *size = sgio->blocksize * sgio->nblocks;
         return 0;
     } else {
-        return ioctl(fd, request, arg);
+        return ioctl_(fd, request, arg);
     }
 }
 
