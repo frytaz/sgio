@@ -289,11 +289,18 @@ dup3(int oldfd, int newfd, int flags)
 }
 
 int
-ioctl(int fd, unsigned long request, uintptr_t arg)
+ioctl(int fd, unsigned long request, ...)
 {
     static int (*ioctl_)(int, unsigned long, ...);
 
     WRAPSYSCALL(ioctl_, "ioctl");
+
+    va_list ap;
+    uintptr_t arg;
+
+    va_start(ap, request);
+    arg = va_arg(ap, uintptr_t);
+    va_end(ap);
 
     sgiom_t *sgio = lookup_sgio(fd);
     if ((sgio != NULL) && (request == BLKGETSIZE64)) {
