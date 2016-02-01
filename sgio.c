@@ -95,7 +95,7 @@ sgio_readcap(sgiom_t *sgm)
     hdr.mx_sb_len = sizeof(sense);
     hdr.iovec_count = 1;
     hdr.dxfer_len = sizeof(readcap16);
-    hdr.dxferp = iov;
+    hdr.dxferp = &iov;
     hdr.cmdp = cdb;
     hdr.sbp = sense;
     hdr.flags = SG_FLAG_DIRECT_IO;
