@@ -119,6 +119,16 @@ rem_sgio(int fd)
     return 0;
 }
 
+static void
+update_sgio(int oldfd, int newfd) {
+    sgiom_t *sgio = lookup_sgio(oldfd);
+
+    if (sgio != NULL) {
+        SGDBG(LOG_DEBUG, "Replacing fd=%d with new fd=%d", oldfd, newfd);
+        sgio->fd = newfd;
+    }
+}
+
 static bool
 sgio_capable(const char *path)
 {
@@ -227,6 +237,51 @@ open(const char *path, int flags, ...)
     }
 
     return fd;
+}
+
+int
+dup(int oldfd)
+{
+    static int (*dup_)(int) = NULL;
+
+    WRAPSYSCALL(dup_, "dup");
+
+    int newfd = dup_(oldfd);
+    if (newfd != -1) {
+        update_sgio(oldfd, newfd);
+    }
+
+    return newfd;
+}
+
+int
+dup2(int oldfd, int newfd)
+{
+    static int (*dup2_)(int, int) = NULL;
+
+    WRAPSYSCALL(dup2_, "dup2");
+
+    int rc = dup2_(oldfd, newfd);
+    if (rc != -1) {
+        update_sgio(oldfd, newfd);
+    }
+
+    return rc;
+}
+
+int
+dup3(int oldfd, int newfd, int flags)
+{
+    static int (*dup3_)(int, int, int) = NULL;
+
+    WRAPSYSCALL(dup3_, "dup3");
+
+    int rc = dup3_(oldfd, newfd, flags);
+    if (rc != -1) {
+        update_sgio(oldfd, newfd);
+    }
+
+    return rc;
 }
 
 int
