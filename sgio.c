@@ -32,8 +32,8 @@
 typedef struct {
     int fd;
     uint64_t flags;
-    size_t blocksize;
-    size_t nblocks;
+    uint32_t blocksize;
+    uint64_t nblocks;
     off_t offset;
 } sgiom_t;
 
@@ -71,6 +71,67 @@ sgdbg(int lvl, const char *file, const int line, const char *fmt, ...)
 
 #define SGDBG(lvl, ...) sgdbg(lvl, __FILE__, __LINE__, __VA_ARGS__)
 
+static int
+sgio_readcap(sgiom_t *sgm)
+{
+    sg_io_hdr_t hdr;
+    uint8_t cdb[16] = { 0 };
+    uint8_t sense[128] = { 0 };
+    uint8_t readcap16[32];
+    struct iovec iov = { .iov_base = readcap16, .iov_len = sizeof(readcap16) };
+
+    // Build READ CAPACITY(16) CDB
+    cdb[0] = 0x9e;
+    cdb[1] = 0x10;
+    cdb[10] = (uint8_t)(sizeof(readcap16) >> 24 & 0xFF);
+    cdb[11] = (uint8_t)(sizeof(readcap16) >> 16 & 0xFF);
+    cdb[12] = (uint8_t)(sizeof(readcap16) >> 8 & 0xFF);
+    cdb[13] = (uint8_t)(sizeof(readcap16) & 0xFF);
+
+    hdr.interface_id = 'S';
+    hdr.dxfer_direction = SG_DXFER_FROM_DEV;
+    hdr.cmd_len = sizeof(cdb);
+    hdr.mx_sb_len = sizeof(sense);
+    hdr.iovec_count = 1;
+    hdr.dxfer_len = total;
+    hdr.dxferp = iov;
+    hdr.cmdp = cdb;
+    hdr.sbp = sense;
+    hdr.flags = SG_FLAG_DIRECT_IO;
+    hdr.timeout = DEFAULT_SCSI_TIMEOUT;
+
+    int rc = ioctl(sgm->fd, SG_IO, &hdr);
+
+    SGDBG(LOG_DEBUG, "ioctl(SG_IO)=%d", rc);
+
+    if (rc < 0) {
+        SGDBG(LOG_ERR, "ioctl(SG_IO) failed (%s)", strerror(errno));
+        return rc;
+    }
+
+    if (hdr.status != 0) {
+        SGDBG(LOG_ERR, "%s failed, SCSI STATUS 0x%hhx", cmd, hdr.status);
+        return -1;
+    }
+
+    sgm->blocksize = (uint32_t)readcap16[11] +
+                    (uint32_t)readcap16[10] << 8 +
+                    (uint32_t)readcap16[9] << 16 +
+                    (uint32_t)readcap16[8] << 24;
+
+    sgm->nblocks = (uint64_t)readcap16[7] +
+                    (uint64_t)readcap16[6] << 8 +
+                    (uint64_t)readcap16[5] << 16 +
+                    (uint64_t)readcap16[4] << 24 +
+                    (uint64_t)readcap16[3] << 32 +
+                    (uint64_t)readcap16[2] << 40 +
+                    (uint64_t)readcap16[1] << 48 +
+                    (uint64_t)readcap16[0] << 56 +
+                    1;
+
+    return 0;
+}
+
 static sgiom_t *
 lookup_sgio(int fd)
 {
@@ -97,9 +158,7 @@ add_sgio(int fd)
 
     sgio->flags |= SGIO_ACTIVE;
     sgio->fd = fd;
-    // FIXME
-    sgio->blocksize = 512;
-    sgio->nblocks = 1 << 31;
+    sgio_readcap(sgio);
     sgio->offset = 0;
 
     return 0;
