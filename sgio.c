@@ -285,6 +285,23 @@ dup3(int oldfd, int newfd, int flags)
 }
 
 int
+ioctl(int fd, unsigned long request, uintptr_t arg)
+{
+    static int (*ioctl_)(int, unsigned long, ...);
+
+    WRAPSYSCALL(ioctl_, "ioctl");
+
+    sgiom_t *sgio = lookup_sgio(fd);
+    if ((sgio != NULL) && (request == BLKGETSIZE64)) {
+        uint64_t *size = (uint64_t*)arg;
+        size = sgio->blocksize;
+        return 0;
+    } else {
+        return ioctl(fd, request, arg);
+    }
+}
+
+int
 close(int fd)
 {
     static int (*close_)(int) = NULL;
