@@ -79,6 +79,7 @@ sgio_readcap(sgiom_t *sgm)
     uint8_t sense[128] = { 0 };
     uint8_t readcap16[32];
     struct iovec iov = { .iov_base = readcap16, .iov_len = sizeof(readcap16) };
+    const char *cmd = "READ CAPACITY(16)";
 
     // Build READ CAPACITY(16) CDB
     cdb[0] = 0x9e;
@@ -93,7 +94,7 @@ sgio_readcap(sgiom_t *sgm)
     hdr.cmd_len = sizeof(cdb);
     hdr.mx_sb_len = sizeof(sense);
     hdr.iovec_count = 1;
-    hdr.dxfer_len = total;
+    hdr.dxfer_len = sizeof(readcap16);
     hdr.dxferp = iov;
     hdr.cmdp = cdb;
     hdr.sbp = sense;
@@ -114,19 +115,19 @@ sgio_readcap(sgiom_t *sgm)
         return -1;
     }
 
-    sgm->blocksize = (uint32_t)readcap16[11] +
-                    (uint32_t)readcap16[10] << 8 +
-                    (uint32_t)readcap16[9] << 16 +
-                    (uint32_t)readcap16[8] << 24;
+    sgm->blocksize = ((uint32_t)readcap16[11]) +
+                    ((uint32_t)readcap16[10] << 8) +
+                    ((uint32_t)readcap16[9] << 16) +
+                    ((uint32_t)readcap16[8] << 24);
 
-    sgm->nblocks = (uint64_t)readcap16[7] +
-                    (uint64_t)readcap16[6] << 8 +
-                    (uint64_t)readcap16[5] << 16 +
-                    (uint64_t)readcap16[4] << 24 +
-                    (uint64_t)readcap16[3] << 32 +
-                    (uint64_t)readcap16[2] << 40 +
-                    (uint64_t)readcap16[1] << 48 +
-                    (uint64_t)readcap16[0] << 56 +
+    sgm->nblocks = ((uint64_t)readcap16[7]) +
+                    ((uint64_t)readcap16[6] << 8) +
+                    ((uint64_t)readcap16[5] << 16) +
+                    ((uint64_t)readcap16[4] << 24) +
+                    ((uint64_t)readcap16[3] << 32) +
+                    ((uint64_t)readcap16[2] << 40) +
+                    ((uint64_t)readcap16[1] << 48) +
+                    ((uint64_t)readcap16[0] << 56) +
                     1;
 
     return 0;
