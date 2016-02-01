@@ -156,7 +156,7 @@ sgio_rdwr(sgiom_t *sgm, sgio_rdwr_t dir, const struct iovec *iov, int iovcnt)
     uint32_t xfer_length = total / sgm->blocksize;
 
     SGDBG(LOG_DEBUG,
-        "Running %s for %zd bytes (%d blocks) from fd=%d at LBA %lld",
+        "Issuing %s for %zd bytes (%d blocks) from fd=%d at LBA %lld",
         cmd, total, xfer_length, sgm->fd, lba);
 
     // Build CDB
@@ -370,6 +370,7 @@ write(int fd, const void *buf, size_t count)
             .iov_base = buf,
             .iov_len = count
         };
+        SGDBG(LOG_DEBUG, "Replacing write(%d) with ioctl(%d, SG_IO)", fd, fd);
         return sgio_rdwr(sgio, SGIO_WRITE, &iov, 1);
     }
 }
