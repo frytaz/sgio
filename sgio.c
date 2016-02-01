@@ -297,7 +297,7 @@ open(const char *path, int flags, ...)
     }
 
     SGDBG(LOG_DEBUG, "Checking %s", path);
-    if (sgio_capable(path)) {
+    if ((fd != -1) && sgio_capable(path)) {
         SGDBG(LOG_DEBUG, "Adding %s", path);
         add_sgio(fd);
     }
