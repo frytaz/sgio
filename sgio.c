@@ -22,6 +22,10 @@
 #include <unistd.h>
 #include <scsi/sg.h>
 
+#if !defined(BLKGETSIZE64)
+#include <linux/fs.h>
+#endif
+
 #define DEFAULT_SCSI_TIMEOUT 10000  /* 10 sec */
 #define BUFLEN 128
 
