@@ -10,5 +10,5 @@ make all
 LD_PRELOAD=./sgio.so cmd --with arguments
 ```
 
-Note that by default it builds native 32 or 64 bit bit binary according to the
+Note that by default it builds native 32 or 64 bit binary according to the
 compiler native configuration.
