@@ -218,6 +218,7 @@ static int
 add_sgio(int fd)
 {
     sgiom_t *sgio = sgiom;
+    int saved_errno = errno;
 
     if (sgio->flags & SGIO_ACTIVE) {
         SGDBG(LOG_WARNING, "Another SGIO already active, skipping");
@@ -231,6 +232,7 @@ add_sgio(int fd)
     sgio_readcap(sgio);
     sgio->offset = 0;
 
+    errno = saved_errno;
     return 0;
 }
 
