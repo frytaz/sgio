@@ -337,7 +337,7 @@ open64(const char *path, int flags, ...)
 }
 
 int
-__open_2(const char *path, int oflag)
+__open_2(const char *path, int flags)
 {
     static int (*open2_)(const char *path, int flags);
 
