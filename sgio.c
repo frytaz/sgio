@@ -337,6 +337,24 @@ open64(const char *path, int flags, ...)
 }
 
 int
+__open_2(const char *path, int oflag)
+{
+    static int (*open2_)(const char *path, int flags);
+
+    WRAPSYSCALL(open2_, "__open_2");
+
+    int fd = open2_(path, flags);
+
+    SGDBG(LOG_DEBUG, "[__open_2] checking %s", path);
+    if ((fd != -1) && sgio_capable(path)) {
+        SGDBG(LOG_DEBUG, "[__open_2] adding %s", path);
+        add_sgio(fd);
+    }
+
+    return fd;
+}
+
+int
 dup(int oldfd)
 {
     static int (*dup_)(int) = NULL;
