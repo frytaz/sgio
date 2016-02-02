@@ -298,9 +298,38 @@ open(const char *path, int flags, ...)
         fd = open_(path, flags);
     }
 
-    SGDBG(LOG_DEBUG, "Checking %s", path);
+    SGDBG(LOG_DEBUG, "[open] checking %s", path);
     if ((fd != -1) && sgio_capable(path)) {
-        SGDBG(LOG_DEBUG, "Adding %s", path);
+        SGDBG(LOG_DEBUG, "[open] adding %s", path);
+        add_sgio(fd);
+    }
+
+    return fd;
+}
+
+int
+open64(const char *path, int flags, ...)
+{
+    static int (*open64_)(const char *path, int flags, ...);
+
+    WRAPSYSCALL(open64_, "open64");
+
+    va_list ap;
+    mode_t mode;
+    int fd;
+
+    if (flags & O_CREAT) {
+        va_start(ap, flags);
+        mode = va_arg(ap, mode_t);
+        va_end(ap);
+        fd = open64_(path, flags, mode);
+    } else {
+        fd = open64_(path, flags);
+    }
+
+    SGDBG(LOG_DEBUG, "[open64] checking %s", path);
+    if ((fd != -1) && sgio_capable(path)) {
+        SGDBG(LOG_DEBUG, "[open64] adding %s", path);
         add_sgio(fd);
     }
 
