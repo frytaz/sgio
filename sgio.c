@@ -439,6 +439,33 @@ close(int fd)
     return rc;
 }
 
+off_t
+lseek(int fd, off_t offset, int whence)
+{
+    static off_t (*lseek_)(int, off_t, int) = NULL;
+
+    WRAPSYSCALL(lseek_, "lseek");
+
+    sgiom_t *sgio = lookup_sgio(fd);
+
+    if ( sgio == NULL) {
+        return lseek_(fd, offset, whence);
+    } else {
+        switch (whence) {
+        case SEEK_SET:
+            sgio->offset = offset;
+            break;
+        case SEEK_CUR:
+            sgio->offset += offset;
+            break;
+        case SEEK_END:
+            sgio->offset = sgio->blocksize * sgio->nblocks + offset;
+            break;
+        }
+        return sgio->offset;
+    }
+}
+
 ssize_t
 pread(int fd, void *buf, size_t count, off_t offset)
 {
